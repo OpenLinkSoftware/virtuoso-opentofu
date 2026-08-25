@@ -1,7 +1,25 @@
-
-# Local OpenTofu state and deployment-specific configuration
+# Terraform/OpenTofu
 **/.terraform/
-**/terraform.tfstate
-**/terraform.tfstate.*
-**/terraform.tfvars
-**/terraform.tfvars.json
+*.tfstate
+*.tfstate.*
+*.tfvars
+!terraform.tfvars.example
+*.tfvars.json
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# OS
+.DS_Store
+*.swp
+*~
+
+# IDE
+.idea/
+.vscode/
+*.iml
