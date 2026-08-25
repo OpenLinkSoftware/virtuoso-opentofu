@@ -1,0 +1,86 @@
+# -------------------------------------------------------
+# Virtuoso on AWS – Example Configuration
+# Copy this file to terraform.tfvars and edit as needed,
+# or run ./deploy.sh for interactive setup.
+# -------------------------------------------------------
+
+region       = "us-east-1"
+project_name = "virtuoso"
+
+# --- Option A: Create a new VPC (default) ---
+create_vpc           = true
+vpc_cidr             = "192.168.0.0/16"
+public_subnet_cidrs  = ["192.168.0.0/24", "192.168.1.0/24"]
+private_subnet_cidrs = ["192.168.128.0/24", "192.168.129.0/24"]
+
+# Restrict browser access to trusted public IPs. Do not use 0.0.0.0/0 unless
+# this is deliberately an internet-facing service protected by other controls.
+web_allowed_cidrs = ["203.0.113.45/32"]
+
+# Public secure SQL is disabled by default. Enable only with a trusted CIDR list.
+expose_sql_endpoint = false
+sql_allowed_cidrs   = []
+
+# --- Option B: Use an existing VPC ---
+# create_vpc                  = false
+# existing_vpc_id             = "vpc-0123456789abcdef0"
+# existing_public_subnet_ids  = ["subnet-aaa", "subnet-bbb"]
+# existing_private_subnet_ids = ["subnet-ccc", "subnet-ddd"]
+
+# --- Virtuoso Container Image ---
+# Option 1: Open Source (free, no license required)
+virtuoso_image     = "openlink/virtuoso-opensource-7"
+virtuoso_image_tag = "latest"
+
+# Memory tuning. Percentage values are resolved against available container memory.
+virtuoso_number_of_buffers = "60%"
+virtuoso_max_dirty_buffers = "45%"
+
+# Option 2: Commercial (requires license file)
+# virtuoso_image        = "openlink/virtuoso-closedsource-8"
+# virtuoso_image_tag    = "latest"
+# virtuoso_license_file = "/path/to/virtuoso.lic"
+
+# --- Container Sizing (REQUIRED - no defaults) ---
+# Choose one of these configurations or specify custom values:
+#
+# Development:       ecs_cpu="512",   ecs_memory="1024"   (0.5 vCPU, 1 GB)
+# Small Production:  ecs_cpu="1024",  ecs_memory="2048"   (1 vCPU, 2 GB)
+# Medium Production: ecs_cpu="2048",  ecs_memory="4096"   (2 vCPU, 4 GB)
+# Large Production:  ecs_cpu="4096",  ecs_memory="8192"   (4 vCPU, 8 GB)
+# Extra Large:       ecs_cpu="8192",  ecs_memory="16384"  (8 vCPU, 16 GB)
+# Maximum:           ecs_cpu="16384", ecs_memory="32768"  (16 vCPU, 32 GB)
+#
+# Valid CPU/Memory combinations (Fargate):
+#   CPU=256:   Memory=512, 1024, 2048
+#   CPU=512:   Memory=1024, 2048, 3072, 4096
+#   CPU=1024:  Memory=2048, 3072, 4096, 5120, 6144, 7168, 8192
+#   CPU=2048:  Memory=4096-16384 (1GB steps)
+#   CPU=4096:  Memory=8192-30720 (1GB steps)
+#   CPU=8192:  Memory=16384-61440 (4GB steps)
+#   CPU=16384: Memory=32768-122880 (8GB steps)
+
+ecs_cpu       = "512"
+ecs_memory    = "1024"
+
+# Keep the DBA secret recoverable in production. Set to 0 only for disposable tests.
+dba_secret_recovery_window_in_days = 7
+
+# --- EFS ---
+efs_throughput_mode = "bursting"
+
+# --- Logging ---
+log_retention_days = 7
+
+
+# --- Backup / Recovery ---
+# Creates an encrypted private S3 bucket for durable copies of Virtuoso online backups.
+backup_sync_image           = "public.ecr.aws/aws-cli/aws-cli:2.15.0"
+backup_bucket_versioning    = true
+backup_bucket_force_destroy = false
+
+# Provider-native schedule for durable S3 backup sync. Recommended for production.
+# This sync schedule complements the Virtuoso internal scheduler configured by
+# ./scripts/setup-scheduled-backup.sh.
+enable_backup_sync_schedule     = false
+backup_sync_schedule_expression = "rate(1 day)"
