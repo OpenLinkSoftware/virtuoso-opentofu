@@ -6,7 +6,7 @@ This repository is for **self-managed** deployments only. It does not contain th
 
 Repository remote:
 
-- `git@devhub.openlinksw.com:/public/hwilliams/virtuoso-opentofu.git`
+- `https://github.com/OpenLinkSoftware/virtuoso-opentofu`
 
 Primary purpose:
 
