@@ -1,0 +1,7 @@
+
+# Local OpenTofu state and deployment-specific configuration
+**/.terraform/
+**/terraform.tfstate
+**/terraform.tfstate.*
+**/terraform.tfvars
+**/terraform.tfvars.json
